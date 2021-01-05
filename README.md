@@ -1,5 +1,5 @@
-# Neural-Control-of-Movement
-4th Year Project
+# Neural Control of Movement
+## Masters Project
 
 In a movement-learning experiment performed by Sadtler et al. [1], 85 neurons in the motor cortex of rhesus macaques were recorded, with a BCI mapping the neural activity to 2-dimensional cursor velocity on a computer screen. After learning to complete the task, the monkeys were required to relearn the desired cursor movements under different perturbations of the BCI.
 
