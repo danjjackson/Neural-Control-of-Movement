@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import os
+import global_variables
 
-def load_parameters(NUM_NEURONS):
+def load_parameters():
 
     # Load all the model parameter files
     model_folder = 'M1_Model/Network_Model_Parameters/'
@@ -11,6 +12,6 @@ def load_parameters(NUM_NEURONS):
     H_BAR = np.reshape(spontaneous_firing_rates - W @ np.maximum(spontaneous_firing_rates, 0), 200)
     x_stars = pd.read_csv(model_folder + 'x_stars.txt', header = None, delimiter = '\t').dropna(axis=1, how='all').values + np.reshape(spontaneous_firing_rates, (200, 1))
 
-    C_movement = np.zeros((2, NUM_NEURONS))
+    C_movement = np.zeros((2, global_variables.NUM_NEURONS))
     C_movement[:, :160] = pd.read_csv(model_folder + 'C_matrix.txt', header = None, delimiter = '\t').dropna(axis=1, how='all').values
-    return W, spontaneous_firing_rates, H_BAR, x_stars, C_movement
+    return W, H_BAR, x_stars, C_movement
