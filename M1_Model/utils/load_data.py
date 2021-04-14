@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import os
-
 
 def load_parameters(NUM_NEURONS):
 
@@ -14,4 +12,4 @@ def load_parameters(NUM_NEURONS):
 
     C_movement = np.zeros((2, NUM_NEURONS))
     C_movement[:, :160] = pd.read_csv(model_folder + 'C_matrix.txt', header = None, delimiter = '\t').dropna(axis=1, how='all').values
-    return W, H_BAR, x_stars, C_movement
+    return W, H_BAR, x_stars, C_movement, spontaneous_firing_rates

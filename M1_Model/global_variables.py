@@ -40,4 +40,4 @@ B_arm_model = np.array([[0.05, 0.025], [0.025, 0.05]])
 ##### Full Circuit Model ######
 LAMBDA = 0.1
 
-W, H_BAR, x_stars, C_movement = load_parameters(NUM_NEURONS)
+W, H_BAR, x_stars, C_movement, spontaneous_firing_rates = load_parameters(NUM_NEURONS)
