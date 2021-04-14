@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 import scipy as sp
+
 from scipy import linalg
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
 
 from utils.plotting_functions import plot_movement, plot_two_by_four
 from utils.load_data import load_parameters
-
 
 ### GLOBAL VARIABLES ###
 
@@ -103,7 +103,9 @@ def solve_arm_model(theta_init, theta_dot_init, dt, num_steps, B, torque):
 
 if __name__ == "__main__":
 
-    W, spontaneous_firing_rates, H_BAR, x_stars, C_movement = load_parameters()
+    print(NUM_NEURONS)
+
+    W, spontaneous_firing_rates, H_BAR, x_stars, C_movement = load_parameters(NUM_NEURONS)
     
     # For each of the 8 movements, simulate the dynamics of neural activity
     firing_rate_stars = np.empty((NUM_NEURONS, N_dynamics, NUM_REACHES))
