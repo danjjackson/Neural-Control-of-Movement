@@ -41,3 +41,8 @@ B_arm_model = np.array([[0.05, 0.025], [0.025, 0.05]])
 LAMBDA = 0.1
 
 W, H_BAR, x_stars, C_movement, spontaneous_firing_rates = load_parameters(NUM_NEURONS)
+
+import os
+print(os.getcwd())
+K = np.load('M1_Model/data/K.npy')
+U_tilde = np.load('M1_Model/data/U_tilde.npy')

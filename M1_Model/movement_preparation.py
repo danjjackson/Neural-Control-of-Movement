@@ -12,7 +12,7 @@ import global_variables as gv
 from movement_execution import solve_M1_dynamics, run_movement_execution
 
 
-def observability_gramian():
+def controllability():
     I = np.identity(gv.NUM_NEURONS)
     W_BAR = gv.W - I
     #Solve Lyapunov Equation to find the observability gramian Q
@@ -23,7 +23,7 @@ def observability_gramian():
 
 
 if __name__=="__main__":
-    K = observability_gramian()
+    K = controllability()
     
     #Calculate columns of U that will map to correct initial conditions (optimal subspace)
     U_tilde = np.empty((gv.NUM_NEURONS, gv.NUM_REACHES))
@@ -35,3 +35,6 @@ if __name__=="__main__":
         test_x_stars[:,i] = prep_firing_rates[:, -1]
 
     run_movement_execution(test_x_stars)
+
+    np.save('M1_Model/data/K', K)
+    np.save('M1_model/data/U_tilde', U_tilde)

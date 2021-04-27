@@ -31,3 +31,15 @@ def plot_movement(trajectories):
     ax.tick_params(axis='both', which='major', labelsize=20)
     ax.tick_params(axis='both', which='minor', labelsize=16)
     plt.show()
+
+def plot_covariance_eigen_values(eig_vals_1, eig_vals_2):
+    fig, ax = plt.subplots(figsize = (10,5))
+    ax.plot(eig_vals_1, label = 'Eigenvalues of Lyapunov Covariance', linewidth = 4)
+    ax.plot(eig_vals_2, label = 'Eigenvalues of SDE Covariance Matrix', linewidth = 4)
+    ax.set_xlabel(r'$i$', fontsize = 18)
+    ax.set_ylabel(r'$\lambda_i$', fontsize = 18)
+    ax.set_xlim(0, 50)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='minor', labelsize=16)
+    ax.legend(fontsize = 16)
+    plt.show()
