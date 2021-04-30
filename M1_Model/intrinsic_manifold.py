@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 from utils.plotting_functions import plot_covariance_eigen_values
-import global_variables as gv
+import utils.global_variables as gv
 
 
 def generate_white_noise(seed, N):
@@ -60,13 +60,15 @@ if __name__=="__main__":
 
     covariance = sp.linalg.solve_continuous_lyapunov(A, -B@B.T)
     svd_basis, svd_coeffs, _ = sp.linalg.svd(covariance)
+    print(np.shape(svd_basis))
 
-    plot_covariance_eigen_values(svd_coeffs, eig_val_P)
+    #plot_covariance_eigen_values(svd_coeffs, eig_val_P)
 
-    limit = find_95_percent_variance(svd_basis, COVARIANCE)
+    limit = find_95_percent_variance(svd_basis, covariance)
 
-    intrinsic_manifold = svd_basis[:,:column]
+    intrinsic_manifold = svd_basis[:,:limit]
 
+    np.save("M1_Model/data/full_basis", svd_basis)
     np.save("M1_Model/data/IntrinsicManifold", intrinsic_manifold) 
     np.save("M1_Model/data/covariance", covariance) 
 

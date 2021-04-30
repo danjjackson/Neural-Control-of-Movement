@@ -1,5 +1,6 @@
 import numpy as np
-from utils.load_data import load_parameters
+from load_data import load_parameters
+import os
 
 ### GLOBAL VARIABLES ###
 
@@ -42,7 +43,8 @@ LAMBDA = 0.1
 
 W, H_BAR, x_stars, C_movement, spontaneous_firing_rates = load_parameters(NUM_NEURONS)
 
-import os
-print(os.getcwd())
 K = np.load('M1_Model/data/K.npy')
 U_tilde = np.load('M1_Model/data/U_tilde.npy')
+full_basis = np.load('M1_Model/data/full_basis.npy')
+intrinsic_manifold = np.load('M1_Model/data/IntrinsicManifold.npy')
+covariance = np.load('M1_Model/data/covariance.npy')

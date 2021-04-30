@@ -6,7 +6,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 from numpy.linalg import inv
 
-from utils.plotting_functions import plot_movement, plot_two_by_four
+from plotting_functions import plot_movement, plot_two_by_four
 import global_variables as gv
 
 from movement_execution import solve_M1_dynamics, run_movement_execution
