@@ -48,3 +48,18 @@ U_tilde = np.load('M1_Model/data/U_tilde.npy')
 full_basis = np.load('M1_Model/data/full_basis.npy')
 intrinsic_manifold = np.load('M1_Model/data/IntrinsicManifold.npy')
 covariance = np.load('M1_Model/data/covariance.npy')
+
+A = (W - np.identity(NUM_NEURONS) + K)/TAU
+B = U_tilde/TAU
+
+B_dash = np.zeros((202, 8))
+B_dash[:200, :] = B
+
+G_dash = np.zeros((202,2))
+G_dash[200:202, :2] = np.identity(2)
+
+M_dash = np.zeros((4, 2))
+M_dash[:2, :2] = np.identity(2)
+
+H_BAR_dash = np.zeros(202)
+H_BAR_dash[:200] = H_BAR

@@ -20,21 +20,6 @@ first_120_Cs = np.load(mapping_folder + 'first_120_Cs.npy')
 all_Cs = [IM_Cs, random_Cs, first_120_Cs]
 variances = [IM_variances, random_variances, first_120_variances]
 
-A = (gv.W - np.identity(gv.NUM_NEURONS) + gv.K)/gv.TAU
-B = gv.U_tilde/gv.TAU
-
-B_dash = np.zeros((202, 8))
-B_dash[:200, :] = B
-
-G_dash = np.zeros((202,2))
-G_dash[200:202, :2] = np.identity(2)
-
-M_dash = np.zeros((4, 2))
-M_dash[:2, :2] = np.identity(2)
-
-H_BAR_dash = np.zeros(202)
-H_BAR_dash[:200] = gv.H_BAR
-
 
 length_scale = 0.15
 
@@ -53,11 +38,11 @@ def generate_GP(time, variance = 40):
         
     return GP, t[:DFT_N], DFT_N
 
-def LQI(A, C, lmbda_Q = 1, lmbda_R = 1):
+def LQI(C, lmbda_Q = 1, lmbda_R = 1):
 
     #Extend matrices
     A_dash = np.zeros((202, 202))
-    A_dash[:200, :200] = A
+    A_dash[:200, :200] = gv.A
     A_dash[200:202, :200] = - C
     
     C_dash = np.zeros((4,202))
@@ -68,28 +53,28 @@ def LQI(A, C, lmbda_Q = 1, lmbda_R = 1):
     Q = lmbda_Q * np.identity(4)
     
     #Solve Riccati Equaiton
-    X_ss = sp.linalg.solve_continuous_are(A_dash, B_dash, C_dash.T @ Q @ C_dash, R)
+    X_ss = sp.linalg.solve_continuous_are(A_dash, gv.B_dash, C_dash.T @ Q @ C_dash, R)
     
     #OPTIMAL CONTROLLER
-    K_x = np.linalg.inv(R) @ B_dash.T @ X_ss
-    K_v = np.linalg.inv(R) @ B_dash.T @ np.linalg.inv(X_ss @ B_dash @ np.linalg.inv(R) @ B_dash.T - A_dash.T)@(C_dash.T @ Q @ M_dash + X_ss@G_dash)
+    K_x = np.linalg.inv(R) @ gv.B_dash.T @ X_ss
+    K_v = np.linalg.inv(R) @ gv.B_dash.T @ np.linalg.inv(X_ss @ gv.B_dash @ np.linalg.inv(R) @ gv.B_dash.T - A_dash.T)@(C_dash.T @ Q @ gv.M_dash + X_ss@gv.G_dash)
     
     #Closed loop dynamics
-    A_BAR = A_dash - B_dash @ K_x
-    B_BAR = G_dash - B_dash @ K_v
+    A_BAR = A_dash - gv.B_dash @ K_x
+    B_BAR = gv.G_dash - gv.B_dash @ K_v
     
-    return A_BAR, B_BAR, K_x, K_v, C_dash
+    return A_BAR, B_BAR, K_x, K_v
 
-def tracking(A, B, x, v, H_BAR_dash):
-    dxdt = A @ x + B @ v + H_BAR_dash
+def tracking(A, B, x, v):
+    dxdt = A @ x + B @ v + gv.H_BAR_dash
     return dxdt
 
-def solve_tracking(x0, num_steps, A, B, v, K_x, K_v, C_dash, H_BAR_dash):
+def solve_tracking(num_steps, A, B, v, K_x, K_v):
     x = np.zeros((202, num_steps))
-    x[:200,0] = x0
+    x[:200,0] = gv.spontaneous_firing_rates
 
     for step in range(num_steps-1):
-        x[:, step+1] = x[:, step] + tracking(A, B, x[:, step], v[:, step], H_BAR_dash) * gv.dt
+        x[:, step+1] = x[:, step] + tracking(A, B, x[:, step], v[:, step]) * gv.dt
 
     #This is an 8 * 4000 array of all 8 control inputs at every one of the 4000 time steps 
     u = - K_x @ x - K_v @ v
@@ -161,7 +146,7 @@ def LQR_bisection(A, lmbda_high, lmbda_low, target, v, B, C):
 
     uTu, xTx = state_LQR(A, B, C, x, lmbda_R = lmbda_high, lmbda_Q = 1)
     
-    print('Initial lambda is {}'.format(lmbda_high))›
+    print('Initial lambda is {}'.format(lmbda_high))
     print('With corresponding starting energy {}'.format(uTu))
 
     while uTu > target:
@@ -181,7 +166,7 @@ def LQR_bisection(A, lmbda_high, lmbda_low, target, v, B, C):
 
     return uTu, xTx
 
-def solve_state_LQR_bisected(target_velocity)
+def solve_state_LQR_bisected(target_velocity):
 
     constant_energies = []
     variable_state_costs = []
@@ -211,16 +196,16 @@ if __name__ == "__main__":
     #plot_gp(GP, t_tracking, tracking = None)
 
     test_C = gv.intrinsic_manifold[:, [0, 1]].T
-    A_BAR, B_BAR, K_x, K_v, C_dash, = LQI(A, test_C)
-    x_tracking, tracking_energy = solve_tracking(gv.spontaneous_firing_rates, N_tracking, A_BAR, B_BAR, GP, K_x, K_v, C_dash, H_BAR_dash)
+    A_BAR, B_BAR, K_x, K_v = LQI(test_C)
+    x_tracking, tracking_energy = solve_tracking(N_tracking, A_BAR, B_BAR, GP, K_x, K_v)
     GP_tracking = test_C @ x_tracking[:200, :]
 
-    #plot_gp(GP, t_tracking, GP_tracking, "Tracking a 2d Gaussian Process using LQI control")
+    plot_gp(GP, t_tracking, GP_tracking, "Tracking a 2d Gaussian Process using LQI control")
 
-    target_velocity = np.array([1,-1])
-    all_energies, all_state_costs = solve_state_LQR(target_velocity)
+    # target_velocity = np.array([1,-1])
+    # all_energies, all_state_costs = solve_state_LQR(target_velocity)
 
-    plot_LQR(variances, all_state_costs, all_energies, -3, None, "State Costs and Control Input Energy vs Percentage Variance accounted for")
+    # plot_LQR(variances, all_state_costs, all_energies, -3, None, "State Costs and Control Input Energy vs Percentage Variance accounted for")
 
-    constant_energies, variable_state_costs = solve_state_LQR_bisected(target_velocity)
-    plot_LQR(variances, variable_state_costs, constant_energies, -3, None, "State Costs and Control Input Energy vs Percentage Variance accounted for")
+    # constant_energies, variable_state_costs = solve_state_LQR_bisected(target_velocity)
+    # plot_LQR(variances, variable_state_costs, constant_energies, -3, None, "State Costs and Control Input Energy vs Percentage Variance accounted for")
